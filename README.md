@@ -29,7 +29,17 @@ and instant, so agents that revisit the same video don't burn credits.
 claude mcp add --transport http bulktranscripts https://bulktranscripts.co/mcp
 ```
 
-### Claude Desktop / any client with a JSON config
+### Claude on the web or desktop
+
+Add it as a **custom connector** (Settings → Connectors → Add custom
+connector) with the URL `https://bulktranscripts.co/mcp`. There is no OAuth
+step — the free tier is keyless.
+
+### ChatGPT
+
+Add it as a connector in developer mode, same URL.
+
+### Any client with a JSON config
 
 ```json
 {
