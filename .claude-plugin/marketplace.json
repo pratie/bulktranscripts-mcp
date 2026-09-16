@@ -1,0 +1,23 @@
+{
+  "name": "bulktranscripts",
+  "owner": { "name": "BulkTranscripts", "email": "hello@bulktranscripts.co" },
+  "metadata": {
+    "description": "BulkTranscripts: YouTube transcripts, search and upload tracking for Claude Code.",
+    "version": "1.1.0"
+  },
+  "plugins": [
+    {
+      "name": "bulktranscripts",
+      "source": "./",
+      "description": "YouTube transcripts for one video, a whole channel or a playlist, plus YouTube search and free new-upload tracking, from the hosted BulkTranscripts MCP server.",
+      "version": "1.1.0",
+      "author": { "name": "BulkTranscripts", "email": "hello@bulktranscripts.co" },
+      "homepage": "https://bulktranscripts.co/youtube-mcp-server",
+      "repository": "https://github.com/pratie/bulktranscripts-mcp",
+      "license": "MIT",
+      "keywords": ["youtube", "transcripts", "mcp"],
+      "category": "productivity",
+      "strict": true
+    }
+  ]
+}

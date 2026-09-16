@@ -1,25 +1,15 @@
-# BulkTranscripts YouTube MCP Server
+# BulkTranscripts MCP server
 
-Give your AI agent YouTube — transcripts, search, channel and playlist listings,
-and free new-upload tracking — through one hosted [MCP](https://modelcontextprotocol.io)
-server.
+YouTube transcripts for AI agents — one video, a whole channel, or a playlist —
+plus YouTube search and free new-upload tracking, through one hosted
+[MCP](https://modelcontextprotocol.io) server. No local process, no `yt-dlp`
+to keep fresh, no IP blocks to fight: extraction, proxy rotation and PO-token
+handling all happen server-side.
 
-**No signup, no OAuth, no API key to start.** Point your client at the URL and it
-works. The free tier is 30 transcripts per IP; a one-time credit pack unlocks
-more, and credits never expire.
-
-- **Server URL:** `https://bulktranscripts.co/mcp` (streamable HTTP)
-- **Docs:** https://bulktranscripts.co/youtube-mcp-server
-- **Registry:** [`co.bulktranscripts/youtube`](https://registry.modelcontextprotocol.io/v0/servers?search=bulktranscripts)
-
-## Why a remote server
-
-Most YouTube transcript tools need you to run a local process, keep `yt-dlp`
-fresh, and fight IP blocks. This one is hosted: extraction, proxy rotation, and
-PO-token handling happen server-side. Your agent just calls a tool.
-
-Transcripts are cached per account — re-reading one you already fetched is free
-and instant, so agents that revisit the same video don't burn credits.
+- **Endpoint:** `https://bulktranscripts.co/mcp` (Streamable HTTP)
+- **Auth:** OAuth (sign in with Google, 30 free credits, no card) or an API key as a Bearer token
+- **Registry:** [`co.bulktranscripts/youtube`](https://registry.modelcontextprotocol.io/v0/servers?search=co.bulktranscripts) · [Glama connector](https://glama.ai/mcp/connectors/co.bulktranscripts/youtube)
+- **Setup docs:** https://bulktranscripts.co/docs#mcp · **REST API:** https://bulktranscripts.co/docs
 
 ## Install
 
@@ -29,17 +19,25 @@ and instant, so agents that revisit the same video don't burn credits.
 claude mcp add --transport http bulktranscripts https://bulktranscripts.co/mcp
 ```
 
-### Claude on the web or desktop
+Run `/mcp` and pick **bulktranscripts** to sign in. This repo is also a Claude Code
+plugin (server + skill):
 
-Add it as a **custom connector** (Settings → Connectors → Add custom
-connector) with the URL `https://bulktranscripts.co/mcp`. There is no OAuth
-step — the free tier is keyless.
+```bash
+/plugin marketplace add pratie/bulktranscripts-mcp
+/plugin install bulktranscripts@bulktranscripts
+```
+
+### Claude (web and desktop)
+
+Settings → Connectors → **Add custom connector** → URL `https://bulktranscripts.co/mcp`.
+Claude opens the Google sign-in; credits then follow your account.
 
 ### ChatGPT
 
-Add it as a connector in developer mode, same URL.
+Settings → Apps & Connectors → Developer mode → **Create** → URL
+`https://bulktranscripts.co/mcp`, authentication **OAuth**.
 
-### Any client with a JSON config
+### Cursor, VS Code, Windsurf, any client with a JSON config
 
 ```json
 {
@@ -52,19 +50,10 @@ Add it as a connector in developer mode, same URL.
 }
 ```
 
-### Cursor
-
-Settings → MCP → Add new server → type `http`, URL `https://bulktranscripts.co/mcp`.
-
-### VS Code
-
-```bash
-code --add-mcp '{"name":"bulktranscripts","type":"http","url":"https://bulktranscripts.co/mcp"}'
-```
-
-### With credits
-
-Pass your license key as a bearer token:
+OAuth-capable clients start the sign-in on the first request. Clients that cannot
+do OAuth send an API key instead — create one free at
+https://bulktranscripts.co/app?tab=mcp (Google sign-in, 30 free credits) or use
+the license key from a credit pack:
 
 ```json
 {
@@ -72,30 +61,33 @@ Pass your license key as a bearer token:
     "bulktranscripts": {
       "type": "http",
       "url": "https://bulktranscripts.co/mcp",
-      "headers": { "Authorization": "Bearer YOUR_LICENSE_KEY" }
+      "headers": { "Authorization": "Bearer ${BULKTRANSCRIPTS_API_KEY}" }
     }
   }
 }
 ```
 
-Clients that can't send headers can use `https://bulktranscripts.co/mcp?key=YOUR_LICENSE_KEY`.
+Clients that cannot send headers can append `?key=YOUR_KEY` to the URL.
 
-## Tools
+## What the agent can do
 
 | Tool | What it does | Cost |
 | --- | --- | --- |
-| `get_transcript` | Full transcript for one video, optionally with timestamped segments. Accepts a URL or an 11-char id. TikTok video URLs work too. | 1 credit (free if already in your library) |
-| `get_transcripts` | Up to 20 videos in one call. | 1 credit each |
-| `search_youtube` | Search videos, channels, or playlists. | 1 credit |
-| `search_channel` | Search inside one channel for a topic. | 1 credit |
-| `get_channel_videos` | List up to 1,000 of a channel's videos. | 1 credit |
-| `get_playlist_videos` | List up to 1,000 videos in a playlist. | 1 credit |
-| `get_latest_videos` | Newest uploads for a channel, via RSS. | **Always free** |
+| `get_transcript` | Full transcript of one YouTube (or TikTok) video as clean text with metadata; timestamped segments on request. | 1 credit, free on repeat reads from your library |
+| `get_transcripts` | Up to 20 videos in one call; videos without captions are reported per item and never fail the batch. | 1 credit per new transcript |
+| `search_youtube` | Search YouTube for videos, channels or playlists by keyword. | 1 credit |
+| `search_channel` | Search inside one channel's uploads for a topic. | 1 credit |
+| `get_channel_videos` | List up to 1,000 of a channel's videos (id, title, duration, URL). | 1 credit |
+| `get_playlist_videos` | List up to 1,000 videos of a public or unlisted playlist, in order. | 1 credit |
+| `get_latest_videos` | A channel's newest uploads with publish dates, from RSS. | **Always free** |
 
-`get_latest_videos` being free is deliberate: poll it to detect new uploads, then
-spend a credit only on what's actually new.
+Every tool is read-only: nothing on YouTube or in your account is modified or
+deleted. Transcripts land in your library once and are free to re-read forever, in
+any format, so agents that revisit the same videos do not burn credits.
+`get_latest_videos` is free on purpose: poll it to detect new uploads, then spend a
+credit only on what is actually new.
 
-## Example prompts
+### Example prompts
 
 > Summarise the last 10 videos from @veritasium and tell me which ones cover quantum mechanics.
 
@@ -103,20 +95,39 @@ spend a credit only on what's actually new.
 
 > Watch @simonwillison for new uploads and transcribe anything about local models.
 
+## How auth works
+
+An unauthenticated request to `/mcp` answers `401` with a `WWW-Authenticate` challenge
+pointing at `/.well-known/oauth-protected-resource/mcp`, which is how MCP clients
+know to start the OAuth flow (dynamic client registration is supported). The same
+`Authorization` header accepts an API key (`bt_ak_…`) or a license key, with or
+without the `Bearer ` prefix.
+
 ## Pricing
 
-Free: 30 transcripts per IP, no account. Then one-time packs — $4.99 / 200
-credits, $14.99 / 1,200, $29 / 3,500. No subscription. Credits don't expire.
+Signing in includes 30 free credits. After that, one-time packs: $4.99 / 200
+credits, $14.99 / 1,200, $29 / 5,000. No subscription; credits never expire.
+Details at https://bulktranscripts.co/#pricing.
 
-See https://bulktranscripts.co/#pricing.
+## Repo layout
 
-## Also available
+| File | Used by |
+| --- | --- |
+| `.mcp.json` | Claude Code plugin config (hosted endpoint, OAuth) |
+| `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | Claude Code plugin marketplace |
+| `plugin.json`, `mcp.json` | Cursor / agent-plugins.org |
+| `skills/youtube-transcripts/` | Agent skill for the REST API (also at [pratie/youtube-transcript-skill](https://github.com/pratie/youtube-transcript-skill)) |
+| `server.json` | Official MCP registry manifest |
 
-- **REST API** — https://bulktranscripts.co/docs
-- **Agent skill** (Claude Code, Codex, any `SKILL.md` agent) — https://github.com/pratie/youtube-transcript-skill
-- **Web app** for bulk exports to TXT/MD/SRT/VTT/CSV/JSON — https://bulktranscripts.co
+## Links
+
+- Product: https://bulktranscripts.co
+- MCP page: https://bulktranscripts.co/youtube-mcp-server
+- API docs: https://bulktranscripts.co/docs · OpenAPI: https://bulktranscripts.co/openapi.json
+- Privacy: https://bulktranscripts.co/privacy · Terms: https://bulktranscripts.co/terms
+- Contact: hello@bulktranscripts.co
 
 ## License
 
-MIT — see [LICENSE](LICENSE). This repo holds the manifest and docs for the
+MIT — see [LICENSE](LICENSE). This repo holds the manifests, plugin and skill for the
 hosted server; the extraction service itself is operated at bulktranscripts.co.

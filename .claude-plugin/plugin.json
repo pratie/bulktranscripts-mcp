@@ -1,0 +1,10 @@
+{
+  "name": "bulktranscripts",
+  "description": "YouTube transcripts for one video, a whole channel or a playlist, plus YouTube search and free new-upload tracking, from the hosted BulkTranscripts MCP server (OAuth sign-in, 30 free credits).",
+  "version": "1.1.0",
+  "author": { "name": "BulkTranscripts", "email": "hello@bulktranscripts.co", "url": "https://bulktranscripts.co" },
+  "homepage": "https://bulktranscripts.co/youtube-mcp-server",
+  "repository": "https://github.com/pratie/bulktranscripts-mcp",
+  "license": "MIT",
+  "keywords": ["youtube", "transcripts", "mcp", "research", "bulktranscripts"]
+}
