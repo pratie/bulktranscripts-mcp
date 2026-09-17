@@ -37,6 +37,14 @@ Claude opens the Google sign-in; credits then follow your account.
 Settings → Apps & Connectors → Developer mode → **Create** → URL
 `https://bulktranscripts.co/mcp`, authentication **OAuth**.
 
+### Gemini CLI
+
+```bash
+gemini extensions install https://github.com/pratie/bulktranscripts-mcp
+```
+
+Sign in with Google when Gemini CLI opens the OAuth page on first use.
+
 ### Cursor, VS Code, Windsurf, any client with a JSON config
 
 ```json
@@ -117,6 +125,7 @@ Details at https://bulktranscripts.co/#pricing.
 | `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | Claude Code plugin marketplace |
 | `plugin.json`, `mcp.json` | Cursor / agent-plugins.org |
 | `skills/youtube-transcripts/` | Agent skill for the REST API (also at [pratie/youtube-transcript-skill](https://github.com/pratie/youtube-transcript-skill)) |
+| `gemini-extension.json` | Gemini CLI extension (hosted endpoint, OAuth) |
 | `server.json` | Official MCP registry manifest |
 
 ## Links

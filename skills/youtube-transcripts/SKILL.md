@@ -1,6 +1,6 @@
 ---
 name: youtube-transcripts
-description: Fetch YouTube video transcripts, search YouTube, list channel or playlist videos, and track new uploads via the BulkTranscripts API. Use when the user shares a YouTube link, asks to summarize/analyze/quote a video, wants transcripts for a whole channel or playlist, needs YouTube research, or asks what a channel posted recently. Requires a free BulkTranscripts API key in BULKTRANSCRIPTS_API_KEY: the user creates one at https://bulktranscripts.co/app?tab=mcp (Google sign-in, 30 free credits, no card).
+description: Fetch YouTube video transcripts, search YouTube, list channel or playlist videos, and track new uploads via the BulkTranscripts API. Use when the user shares a YouTube link, asks to summarize/analyze/quote a video, wants transcripts for a whole channel or playlist, needs YouTube research, or asks what a channel posted recently. Requires a free BulkTranscripts API key in BULKTRANSCRIPTS_API_KEY, which the user creates at https://bulktranscripts.co/app?tab=mcp (Google sign-in, 30 free credits, no card).
 license: MIT (skill file); the BulkTranscripts API itself is a hosted service.
 last-updated: 2026-09-16
 ---
