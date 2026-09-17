@@ -7,6 +7,13 @@ last-updated: 2026-09-16
 
 # YouTube transcripts via BulkTranscripts
 
+Clean YouTube transcripts, search and channel data for AI agents, from
+[BulkTranscripts](https://bulktranscripts.co).
+[Docs](https://bulktranscripts.co/docs) ·
+[OpenAPI spec](https://bulktranscripts.co/openapi.json) ·
+[MCP server](https://bulktranscripts.co/youtube-mcp-server) ·
+[Free API key](https://bulktranscripts.co/app?tab=mcp)
+
 Base URL: `https://bulktranscripts.co`
 
 All endpoints are plain GET returning JSON, and **every one of them needs an API
@@ -141,4 +148,4 @@ hit, and what to do about each:
   Limits are per public IP: 120 requests/min overall, 30/min under `/api/v1/`
   (cache hits and `/account` count too), so pace bulk fetches at under 30/min.
 
-Full reference: https://bulktranscripts.co/docs
+Full reference: [bulktranscripts.co/docs](https://bulktranscripts.co/docs) · pricing: [one-time credit packs](https://bulktranscripts.co/#pricing)
