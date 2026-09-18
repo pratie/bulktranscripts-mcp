@@ -88,12 +88,17 @@ Clients that cannot send headers can append `?key=YOUR_KEY` to the URL.
 | `get_channel_videos` | List up to 1,000 of a channel's videos (id, title, duration, URL). | 1 credit |
 | `get_playlist_videos` | List up to 1,000 videos of a public or unlisted playlist, in order. | 1 credit |
 | `get_latest_videos` | A channel's newest uploads with publish dates, from RSS. | **Always free** |
+| `start_bulk_extract` | Fetch every transcript of a channel, playlist or video URL (up to 1,000) as a background job; returns a `run_id` at once. | Listing free, 1 credit per new transcript |
+| `get_bulk_status` | Progress of a bulk job with `check_again_in_seconds`, so agents poll at the right pace. | Free |
+| `list_bulk_results` | Paged per-video outcomes of a bulk job (id, title, channel, duration, word count, status). Text stays behind `get_transcript`, free once in the library. | Free |
 
 Every tool is read-only: nothing on YouTube or in your account is modified or
 deleted. Transcripts land in your library once and are free to re-read forever, in
 any format, so agents that revisit the same videos do not burn credits.
 `get_latest_videos` is free on purpose: poll it to detect new uploads, then spend a
-credit only on what is actually new.
+credit only on what is actually new. For anything larger than about 20 videos,
+`start_bulk_extract` runs the whole channel or playlist on the server while the
+agent polls `get_bulk_status`.
 
 ### Example prompts
 
