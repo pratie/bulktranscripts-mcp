@@ -26,7 +26,7 @@ curl -s "https://bulktranscripts.co/api/v1/..." \
 ```
 
 If `BULKTRANSCRIPTS_API_KEY` is not set, ask the user for a key: they sign in
-with Google at https://bulktranscripts.co/app?tab=mcp, open the **Connect AI**
+with Google at https://bulktranscripts.co/app?tab=mcp, open the **MCP & API**
 tab, and hit **Create key** in the **API keys** card. It is free, includes 30
 credits, and needs no card. Keys start with `bt_ak_`, are shown once, and up to
 5 can be live per account. A license key from a credit-pack purchase works as a
