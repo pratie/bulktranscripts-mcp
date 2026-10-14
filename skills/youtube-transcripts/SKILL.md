@@ -1,8 +1,8 @@
 ---
 name: youtube-transcripts
-description: Fetch YouTube video transcripts, search YouTube, list channel or playlist videos, run a background bulk job for a whole channel or playlist, and track new uploads via the BulkTranscripts API. Use when the user shares a YouTube link, asks to summarize/analyze/quote a video, wants transcripts for a whole channel or playlist, needs YouTube research, or asks what a channel posted recently. Requires a free BulkTranscripts API key in BULKTRANSCRIPTS_API_KEY, which the user creates at https://bulktranscripts.co/app?tab=mcp (Google sign-in, 30 free credits, no card).
-license: MIT (skill file); the BulkTranscripts API itself is a hosted service.
-last-updated: 2026-09-18
+description: Fetch YouTube video transcripts, search YouTube, list channel or playlist videos, run a background bulk job for a whole channel or playlist, and track new uploads with the BulkTranscripts MCP server. Use when the user shares a YouTube link, asks to summarize/analyze/quote a video, wants transcripts for a whole channel or playlist, needs YouTube research, or asks what a channel posted recently. The plugin connects the hosted server at https://bulktranscripts.co/mcp; the user signs in once with OAuth (Google sign-in, 30 free credits, no card).
+license: MIT (skill file); BulkTranscripts itself is a hosted service.
+last-updated: 2026-10-14
 ---
 
 # YouTube transcripts via BulkTranscripts
@@ -10,173 +10,68 @@ last-updated: 2026-09-18
 Clean YouTube transcripts, search and channel data for AI agents, from
 [BulkTranscripts](https://bulktranscripts.co).
 [Docs](https://bulktranscripts.co/docs) ·
-[OpenAPI spec](https://bulktranscripts.co/openapi.json) ·
 [MCP server](https://bulktranscripts.co/youtube-mcp-server) ·
-[Free API key](https://bulktranscripts.co/app?tab=mcp)
+[Pricing](https://bulktranscripts.co/#pricing)
 
-Base URL: `https://bulktranscripts.co`
+This plugin connects the hosted MCP server `bulktranscripts`
+(`https://bulktranscripts.co/mcp`). The first tool call asks the user to sign in
+through OAuth; after that, use the tools below. There is no API key to manage.
 
-All endpoints are plain GET returning JSON, and **every one of them needs an API
-key** — including the free endpoints. Send it as a Bearer token on every
-request:
+## Tools
 
-```bash
-curl -s "https://bulktranscripts.co/api/v1/..." \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
+| Tool | Use it for | Cost |
+|---|---|---|
+| `get_transcript` | One video: watch URL, youtu.be link, Shorts URL or 11-character id | 1 credit the first time, free after |
+| `get_transcripts` | Up to 20 videos in one call | 1 credit per new video |
+| `start_bulk_extract` | A whole channel, playlist or video list in the background | 1 credit per new transcript |
+| `get_bulk_status` | Progress of a bulk job | Free |
+| `list_bulk_results` | Per-video outcomes of a bulk job, page by page | Free |
+| `search_youtube` | Keyword search for videos, channels or playlists | 1 credit |
+| `search_channel` | A topic inside one channel's uploads | 1 credit |
+| `get_channel_videos` | List a channel's videos without transcripts | 1 credit |
+| `get_playlist_videos` | List a playlist in order | 1 credit |
+| `get_latest_videos` | A channel's newest uploads (up to 15) | Always free |
 
-If `BULKTRANSCRIPTS_API_KEY` is not set, ask the user for a key: they sign in
-with Google at https://bulktranscripts.co/app?tab=mcp, open the **MCP & API**
-tab, and hit **Create key** in the **API keys** card. It is free, includes 30
-credits, and needs no card. Keys start with `bt_ak_`, are shown once, and up to
-5 can be live per account. A license key from a credit-pack purchase works as a
-Bearer token too.
+A transcript is free for this account once it is in the account's library, in
+any format. Videos without captions, members-only and private videos are
+skipped and never charged.
 
-## Costs (check `billing.remaining` in every response)
+## Whole channels and playlists
 
-- Transcript: 1 credit when first added to this account's library — repeat reads are **FREE**
-- Search / channel videos / playlist videos: 1 credit each
-- `channel/latest` and `account`: always free
-- Failures (no captions, video unreachable) are auto-refunded, never charged
+Call `start_bulk_extract` with the channel or playlist URL. It returns a
+`run_id` right away and keeps working on the server.
 
-When a call returns HTTP 402 `out_of_credits`, tell the user their credits are
-used up and link them to https://bulktranscripts.co/#pricing (one-time packs,
-never expire). Credits follow the Google account, so topping up keeps the same
-API key working.
-
-## Endpoints
-
-### Get one transcript
-```bash
-curl -s "https://bulktranscripts.co/api/v1/transcript?video=VIDEO_URL_OR_ID" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-Params: `video` (watch URL, youtu.be, Shorts, bare 11-char id, or TikTok video
-URL) · `language` (default `en`) · `segments=0` to omit timestamps (smaller) ·
-`format=txt|md|srt|vtt|csv|ai` to get a rendered file instead of JSON ·
-`fresh=1` to force re-extraction.
-
-Response fields: `title`, `channel`, `duration`, `upload_date`, `language`,
-`source` (manual_caption|auto_caption), `cached`, `word_count`, `text`,
-`paragraphs[]` (silence-grouped — best for reading/chunking), `segments[]`
-(`{text, start, duration}`), `billing`.
-
-Long videos produce long text. For summarization, prefer `segments=0` and read
-`paragraphs`.
-
-### Search YouTube (1 credit)
-```bash
-curl -s "https://bulktranscripts.co/api/v1/search?q=QUERY&limit=10" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-Add `type=channel` or `type=playlist` to search for channels/playlists instead
-of videos.
-
-### Search inside one channel (1 credit)
-```bash
-curl -s "https://bulktranscripts.co/api/v1/channel/search?channel=@HANDLE&q=TOPIC&limit=10" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-Finds a creator's videos about a topic without listing the whole archive.
-
-### List a channel's videos (1 credit, up to 1000)
-```bash
-curl -s "https://bulktranscripts.co/api/v1/channel/videos?channel=@HANDLE&limit=100" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-`channel` accepts @handle, channel URL, or UC… id.
-
-### List a playlist in order (1 credit)
-```bash
-curl -s "https://bulktranscripts.co/api/v1/playlist/videos?playlist=PLAYLIST_ID_OR_URL" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-
-### Newest uploads — FREE, use for monitoring
-```bash
-curl -s "https://bulktranscripts.co/api/v1/channel/latest?channel=@HANDLE" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-Returns up to 15 recent videos. Poll this freely; only spend credits on videos
-that are actually new. Diff on video `id`, not on `published`: when YouTube's
-feed is unavailable the response says `"source": "listing"` and `published`
-can be null.
-
-### Balance
-```bash
-curl -s "https://bulktranscripts.co/api/v1/account" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-
-### Whole channel or playlist in one job (listing free, 1 credit per transcript)
-```bash
-curl -s -X POST "https://bulktranscripts.co/api/v1/bulk" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://www.youtube.com/playlist?list=PLAYLIST_ID", "max_videos": 200}'
-```
-`url` takes a playlist, a channel (`@handle` or URL) or a single video; `max_videos`
-caps the job at up to 1,000. Returns `202` at once with `run_id`, `status`,
-`videos_found` (null until a large channel has been listed), the counts and
-`check_again_in_seconds`. The server keeps fetching after the response, into
-this account's library. Poll no sooner than `check_again_in_seconds`:
-```bash
-curl -s "https://bulktranscripts.co/api/v1/bulk/RUN_ID" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-`status` ends as `completed`, or `stopped` after a server restart (start the
-same URL again; everything already fetched is free). `quota` counts videos not
-attempted because credits ran out; `skipped` counts videos without captions.
-Then page the outcomes, metadata only, passing `next_cursor` back as `cursor`:
-```bash
-curl -s "https://bulktranscripts.co/api/v1/bulk/RUN_ID/results?limit=100" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-Each item has `video_id`, `title`, `channel`, `duration`, `word_count` and
-`status` (`ok`, `cached`, or `error` with a code). Every ok or cached video is
-in the library, so `/transcript?video=ID` returns its text without a credit.
-Two jobs per account at a time. Prefer a job over one-by-one fetches for
-anything larger than about 20 videos.
+- `max_videos`: up to 1,000 per job. For a bigger channel, run blocks with
+  `start_at` 1, then 1001, then 2001 (newest first). `get_bulk_status` returns
+  the next `start_at` when a block was full.
+- `content`: `videos` (default, long-form uploads), `shorts`, or `live` (past
+  live streams; upcoming and still-running streams are skipped).
+- Poll `get_bulk_status` no sooner than its `check_again_in_seconds`; `0` means
+  the job is done. Then page `list_bulk_results` and read the transcripts you
+  need with `get_transcript`, which is free for anything the job added.
+- Two jobs per account at a time. Prefer a job over one-by-one fetches for
+  anything larger than about 20 videos.
 
 ## Playbooks
 
-- **"Summarize this video"** → transcript with `segments=0`, then summarize
-  from `paragraphs`; cite the `title` and `url`.
-- **Whole channel/playlist** → start a bulk job, tell the user the
-  `videos_found` count (each new library transcript = 1 credit), poll status
-  at the pace it asks for, then read the transcripts you need from the
-  library for free. For a handful of videos, list them and fetch one by one.
-- **"What did X post this week?"** → `channel/latest` (free), compare video
-  ids against what you have seen (use `published` when present), fetch
-  transcripts only for the relevant new videos.
-- **Deep research on a creator** → `channel/search` for the topic (or list all
-  videos), pick candidates by title, fetch only those transcripts.
+- **"Summarize this video"**: `get_transcript`, summarize from the paragraphs,
+  cite the title and URL. Set `include_segments` only when quotes need
+  timestamps.
+- **Whole channel or playlist**: tell the user how many videos the job found
+  (each new transcript is 1 credit), then run the bulk job as above.
+- **"What did X post this week?"**: `get_latest_videos` (free), compare the
+  video ids with what you have already seen, and fetch transcripts only for
+  the new videos that matter.
+- **Deep research on a creator**: `search_channel` for the topic, pick
+  candidates by title, fetch only those transcripts.
 
-Errors come as `{"error": {"code", "message"}}`. The codes you will actually
-hit, and what to do about each:
+## When something fails
 
-- `no_transcript` (404) — the video has no captions. Not charged. Skip it and
-  carry on; in a batch this is normal, not a failure.
-- `resolution_failed` (400) — a well-formed id or URL that could not be
-  resolved (nonexistent, private, removed, or region-blocked). Handle it
-  alongside `no_transcript`: skip the video and carry on.
-- `playlist_private` (400) — YouTube says the playlist does not exist, which is
-  also what it says about a *private* playlist. Playlist ids come in several
-  lengths (13, 18, 26, 34) and all work, so do not second-guess the id: tell
-  the user to open the playlist on YouTube → Edit → Visibility → Unlisted,
-  then retry. Not charged.
-- `missing_api_key` (401) — no key was sent. Ask the user to create a key at
-  https://bulktranscripts.co/app?tab=mcp and provide it, then set
-  `BULKTRANSCRIPTS_API_KEY` and retry.
-- `invalid_api_key` (401) — the key sent is not valid. Ask the user to check it
-  or create a new one at https://bulktranscripts.co/app?tab=mcp.
-- `invalid_input` (400) — the `video` / `channel` / `playlist` parameter is
-  missing, not a YouTube/TikTok reference, or otherwise malformed. A caller
-  bug, not a video problem.
-- `out_of_credits` (402) — balance exhausted. Tell the user and link
-  https://bulktranscripts.co/#pricing.
-- `rate_limited` (429) — respect the `Retry-After` header before retrying.
-  Limits are per public IP: 120 requests/min overall, 30/min under `/api/v1/`
-  (cache hits and `/account` count too), so pace bulk fetches at under 30/min.
+- No captions: the video is skipped, not charged. Carry on with the rest.
+- Private playlist: YouTube reports it as nonexistent. Ask the user to open it
+  on YouTube, choose Edit, set Visibility to Unlisted, then try again.
+- Out of credits: completed results still come back, and the response says how
+  many videos were not fetched. Point the user to
+  [one-time credit packs](https://bulktranscripts.co/#pricing).
 
-Full reference: [bulktranscripts.co/docs](https://bulktranscripts.co/docs) · pricing: [one-time credit packs](https://bulktranscripts.co/#pricing)
+Full reference: [bulktranscripts.co/docs](https://bulktranscripts.co/docs)

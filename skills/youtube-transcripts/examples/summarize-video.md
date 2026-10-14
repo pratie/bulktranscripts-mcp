@@ -7,22 +7,14 @@
 
 **What the agent does**
 
-1. Fetches the transcript (keeps timestamps for quoting):
-
-```bash
-curl -s "https://bulktranscripts.co/api/v1/transcript?video=VIDEO_ID" \
-  -H "Authorization: Bearer $BULKTRANSCRIPTS_API_KEY"
-```
-
-2. Reads `paragraphs[]` for the summary (silence-grouped — better section
-   boundaries than raw captions), and `segments[]` (`{text, start, duration}`)
-   to attach a `start` timestamp to each quote.
-3. Cites `title`, `channel`, and `url` from the response metadata.
+1. Calls `get_transcript` with the URL and `include_segments: true`, because
+   the quotes need timestamps.
+2. Summarizes from the paragraphs, and takes each quote's start time from the
+   segments.
+3. Cites the title, channel and URL from the response.
 
 **Tips**
 
-- For summaries without quoting, add `segments=0` — much smaller response.
-- `format=ai` returns a ready-made markdown document instead of JSON if the
-  user just wants a clean file.
-- A video with no captions returns `error.code = "no_transcript"` (HTTP 404)
-  and is never charged.
+- For a summary without quotes, leave `include_segments` off. The response is
+  much smaller.
+- A video with no captions comes back as `no_transcript` and is never charged.

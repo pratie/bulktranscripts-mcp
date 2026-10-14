@@ -129,7 +129,8 @@ Details at https://bulktranscripts.co/#pricing.
 | `.mcp.json` | Claude Code plugin config (hosted endpoint, OAuth) |
 | `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | Claude Code plugin marketplace |
 | `plugin.json`, `mcp.json` | Cursor / agent-plugins.org |
-| `skills/youtube-transcripts/` | Agent skill for the REST API (also at [pratie/youtube-transcript-skill](https://github.com/pratie/youtube-transcript-skill)) |
+| `.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json`, `assets/icon.png` | Codex plugin |
+| `skills/youtube-transcripts/` | Agent skill for the MCP tools (the REST API version is at [pratie/youtube-transcript-skill](https://github.com/pratie/youtube-transcript-skill)) |
 | `gemini-extension.json` | Gemini CLI extension (hosted endpoint, OAuth) |
 | `server.json` | Official MCP registry manifest |
 
