@@ -2,9 +2,13 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "co.bulktranscripts/youtube",
   "title": "BulkTranscripts YouTube",
-  "description": "YouTube transcripts, search, channel/playlist listings and upload tracking for AI agents.",
+  "description": "YouTube transcripts for AI agents: one video, a whole channel or playlist, search, new uploads.",
   "websiteUrl": "https://bulktranscripts.co/youtube-mcp-server",
-  "version": "1.1.0",
+  "repository": {
+    "url": "https://github.com/pratie/bulktranscripts-mcp",
+    "source": "github"
+  },
+  "version": "1.1.1",
   "remotes": [
     {
       "type": "streamable-http",
